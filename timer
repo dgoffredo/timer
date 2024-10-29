@@ -1,7 +1,8 @@
 #!/bin/sh
 
 timespec=$1
-nickname=$2
+shift
+nickname=$*
 
 minutes_pattern='^\s*\([0-9]\+\):[0-9]\+\s*$'
 seconds_pattern='^\s*\([0-9]\+:\)\?\([0-9]\+\)\s*$'
@@ -19,6 +20,14 @@ if [ -n "$nickname" ]; then
   prefix="$nickname "
 fi
 
+print_countdown() {
+  remaining=$1
+  minutes_left=$((remaining / 60))
+  seconds_left=$((remaining % 60))
+  display=$(printf '%s%02d:%02d left' "$prefix" "$minutes_left" "$seconds_left")
+  printf '\e[0G%s\033]0;%s\007' "$display" "$display"
+}
+
 begin=$(date +%s)
 
 while true; do
@@ -26,7 +35,8 @@ while true; do
   elapsed=$((now - begin))
   remaining=$((seconds - elapsed))
   if [ "$remaining" -le 0 ]; then
-    scriptdir=$(dirname "$0")
+    print_countdown 0
+    scriptdir=$(dirname "$(readlink -f "$0")")
     cvlc "$scriptdir/ring.mp3" 2>/dev/null
     exit
   fi
@@ -37,10 +47,7 @@ while true; do
 
   previous_remaining=$remaining
 
-  minutes_left=$((remaining / 60))
-  seconds_left=$((remaining % 60))
-  display=$(printf '%s%02d:%02d left' "$prefix" "$minutes_left" "$seconds_left")
-  printf '\e[0G%s\033]0;%s\007' "$display" "$display"
+  print_countdown "$remaining"
   sleep 0.1
 done
 printf '\n'
