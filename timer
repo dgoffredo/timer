@@ -37,7 +37,8 @@ while true; do
   if [ "$remaining" -le 0 ]; then
     print_countdown 0
     scriptdir=$(dirname "$(readlink -f "$0")")
-    cvlc "$scriptdir/ring.mp3" 2>/dev/null
+    # --gain increases the volume. I think that 2 is twice as loud.
+    cvlc --gain 2 "$scriptdir/ring.mp3" 2>/dev/null
     exit
   fi
 
