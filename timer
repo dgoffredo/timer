@@ -43,13 +43,13 @@ while true; do
   fi
 
   if [ "$remaining" = "$previous_remaining" ]; then
+    sleep 0.1
     continue
   fi
 
   previous_remaining=$remaining
 
   print_countdown "$remaining"
-  sleep 0.1
 done
 printf '\n'
 
